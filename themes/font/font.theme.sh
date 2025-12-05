@@ -31,22 +31,28 @@ SCM_GIT_SHOW_MINIMAL_INFO=true
 CLOCK_THEME_PROMPT_PREFIX=''
 CLOCK_THEME_PROMPT_SUFFIX=' '
 THEME_SHOW_CLOCK=${THEME_SHOW_CLOCK:-"true"}
-THEME_CLOCK_COLOR=${THEME_CLOCK_COLOR:-"$_omb_prompt_bold_navy"}
-THEME_CLOCK_FORMAT=${THEME_CLOCK_FORMAT:-"%I:%M:%S"}
+THEME_CLOCK_COLOR=${THEME_CLOCK_COLOR:-"$_omb_prompt_gray"}
+THEME_CLOCK_FORMAT=${THEME_CLOCK_FORMAT:-"%H:%M:%S"}
 
 OMB_PROMPT_VIRTUALENV_FORMAT='(%s) '
 OMB_PROMPT_CONDAENV_FORMAT='(%s) '
 OMB_PROMPT_SHOW_PYTHON_VENV=${OMB_PROMPT_SHOW_PYTHON_VENV:=true}
 
+function __ps_time {
+  _omb_util_print "$(clock_prompt)${_omb_prompt_normal}\n"
+}
+
 function _omb_theme_PROMPT_COMMAND() {
     # This needs to be first to save last command return code
     local RC="$?"
 
-    local hostname="${_omb_prompt_bold_gray}\u@\h"
+    local hostname="${_omb_prompt_bold_blue}\u@\h"
     local python_venv; _omb_prompt_get_python_venv
     python_venv=$_omb_prompt_white$python_venv
     local spack_env; _omb_prompt_get_spack_env
     spack_env=$_omb_prompt_white$spack_env
+
+    ps_path="${_omb_prompt_bold_teal}\w${_omb_prompt_normal}"
 
     # Set return status color
     if [[ ${RC} == 0 ]]; then
@@ -58,7 +64,7 @@ function _omb_theme_PROMPT_COMMAND() {
     # Append new history lines to history file
     history -a
 
-    PS1="$(clock_prompt)$spack_env$python_venv${hostname} ${_omb_prompt_bold_teal}\W $(scm_prompt_char_info)${ret_status}→ ${_omb_prompt_normal}"
+    PS1="$(__ps_time)$spack_env$python_venv${hostname} $ps_path $(scm_prompt_char_info)${ret_status}→ ${_omb_prompt_normal}"
 }
 
 _omb_util_add_prompt_command _omb_theme_PROMPT_COMMAND
